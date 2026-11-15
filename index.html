@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#e9ede8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1512" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Ledger">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+<title>Trapper's Ledger 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: one-column phone app. Scrolling title, sticky search + filter, grouped rows that expand in place, fixed bottom tab bar. */
+:root{
+  --bg:#e9ede8; --surface:#f7f8f4; --ink:#17201b; --muted:#56635b; --line:#cbd5cb;
+  --accent:#1f6a4e; --accent-ink:#ffffff; --soft:#d5e6dc; --warn:#7a4f0c; --warn-bg:#f0e1c0;
+  --display:"Alfa Slab One",Rockwell,"Roboto Slab",Georgia,serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --label:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1512; --surface:#18211c; --ink:#e4ebe5; --muted:#9aa89e; --line:#2a362f;
+    --accent:#5fbf92; --accent-ink:#0b1a12; --soft:#1f3a2d; --warn:#e0b86a; --warn-bg:#3a2f17;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1512; --surface:#18211c; --ink:#e4ebe5; --muted:#9aa89e; --line:#2a362f;
+  --accent:#5fbf92; --accent-ink:#0b1a12; --soft:#1f3a2d; --warn:#e0b86a; --warn-bg:#3a2f17;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font:16px/1.4 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:0 92px; -webkit-tap-highlight-color:transparent;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.wrap{max-width:680px;margin:0 auto}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.top{padding-block:18px 8px}
+h1{font:400 28px/1.1 var(--display);margin:0;letter-spacing:.01em}
+.tag-line{font:500 13px var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:4px 0 12px}
+.prog{display:grid;gap:6px}
+.prog-txt{display:flex;justify-content:space-between;font:500 14px var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+
+.ctl{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px 10px;display:grid;gap:8px}
+#q{width:100%;min-height:44px;font:16px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:0 12px;-webkit-appearance:none;appearance:none}
+#q::placeholder{color:var(--muted)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{min-height:38px;border-radius:7px;font:600 14px var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:16px 0 8px;font:600 14px var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+ul{list-style:none;margin:0;padding:0}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:8px;display:grid;grid-template-columns:52px minmax(0,1fr)}
+.row.have .nm,.row.done .nm{color:var(--muted)}
+.row.done .nm{text-decoration:line-through}
+.cb{width:52px;min-height:56px;display:grid;place-items:center}
+.box{width:26px;height:26px;border:2px solid var(--muted);border-radius:7px;display:grid;place-items:center;transition:background .12s,border-color .12s}
+.box svg{width:16px;height:16px;opacity:0;stroke:var(--accent-ink)}
+.cb[aria-checked="true"] .box{background:var(--accent);border-color:var(--accent)}
+.cb[aria-checked="true"] .box svg{opacity:1}
+.main{min-height:56px;padding:8px 12px 8px 0;display:flex;align-items:center;gap:8px;text-align:left;min-width:0}
+.txt{flex:1;min-width:0;display:grid;gap:1px}
+.nm{font-weight:600;overflow-wrap:anywhere}
+.sub{font:500 14px var(--label);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.chev{width:18px;height:18px;flex:none;stroke:var(--muted);transition:transform .15s}
+.row.open .chev{transform:rotate(180deg)}
+.pill{font:600 13px var(--label);letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--accent);white-space:nowrap}
+.pill.on{background:var(--accent);color:var(--accent-ink)}
+.more{grid-column:1/-1;border-top:1px solid var(--line);padding:12px 14px 14px;display:grid;gap:10px;font-size:15px}
+.more[hidden]{display:none!important}
+.k{font:600 13px var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 2px}
+.more p{margin:0}
+.uses{display:grid;gap:2px}
+.uses li{display:flex;justify-content:space-between;gap:12px}
+.uses li.dim{color:var(--muted);text-decoration:line-through}
+.warn{display:inline-block;font:600 12px var(--label);letter-spacing:.08em;text-transform:uppercase;background:var(--warn-bg);color:var(--warn);padding:2px 7px;border-radius:5px;margin-bottom:4px}
+.mrow{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:start;border-top:1px dashed var(--line);margin:0 -14px;padding:0 14px}
+.mrow:first-of-type{border-top:0}
+.mrow .cb{width:44px;min-height:48px}
+.mrow .mb{padding:10px 0;min-width:0}
+.mrow .mn{font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.mrow .mw{font-size:14px;color:var(--muted);margin-top:2px}
+.empty{text-align:center;color:var(--muted);padding:36px 12px}
+.empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+
+.foot{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);font-size:14px;color:var(--muted);display:grid;gap:10px}
+.foot a{color:var(--accent)}
+.reset{justify-self:start;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:10px;font:600 14px var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--ink)}
+.reset.arm{background:var(--warn-bg);color:var(--warn);border-color:var(--warn)}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border-top:1px solid var(--line);
+  padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tabs button{min-height:52px;display:grid;justify-items:center;align-content:center;gap:2px;font:600 13px var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.tabs button[aria-selected="true"]{color:var(--accent)}
+.tabs svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.npc{margin-top:22px}
+.npc-h{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:8px 0 10px;border-bottom:2px solid var(--accent)}
+.npc-h .txt{flex:1;min-width:0}
+.npc-n{font:400 22px/1.15 var(--display)}
+.npc-h[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.npc-b{font-size:14px;color:var(--muted);margin:10px 0 0}
+.ctr{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:44px;height:44px;border:1px solid var(--line);border-radius:10px;font:600 22px/1 var(--body);background:var(--bg);color:var(--ink)}
+.cnt{min-width:64px;text-align:center;font:600 18px var(--label);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.uses small{color:var(--muted);font:500 13px var(--label);letter-spacing:.06em;text-transform:uppercase;margin-left:6px}
+.tabs{grid-template-columns:repeat(3,1fr)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <h1>Trapper's Ledger</h1>
+    <p class="tag-line">Red Dead Redemption 2 · crafting materials</p>
+    <div class="prog" aria-live="polite">
+      <div class="prog-txt"><span id="progL">Have 0 of 0</span><span id="progR"></span></div>
+      <div class="bar"><i id="progBar"></i></div>
+    </div>
+  </div>
+  <div class="ctl">
+    <input id="q" type="search" placeholder="Search an NPC, item, animal or challenge" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Search">
+    <div class="seg" id="seg" role="group" aria-label="Filter"></div>
+  </div>
+  <main id="list"></main>
+  <div class="foot">
+    <p>Only three-star animals drop perfect pelts, so check the star rating before you shoot. Entries marked "Unconfirmed" are my best guess; check them against the in-game map.</p>
+    <p>Locations compiled from the guides at <a href="https://www.rdr2.org/guides/trapper-crafting-materials-guide/" target="_blank" rel="noopener">rdr2.org (Trapper)</a>, <a href="https://www.rdr2.org/guides/pearson-crafting-guide/" target="_blank" rel="noopener">rdr2.org (Pearson)</a>, <a href="https://www.rdr2.org/guides/all-animal-locations-guide/5/" target="_blank" rel="noopener">rdr2.org (animals)</a> and <a href="https://www.powerpyx.com/red-dead-redemption-2-legendary-animals-locations/" target="_blank" rel="noopener">PowerPyx (legendaries)</a>. Challenges from <a href="https://www.gamerguides.com/red-dead-redemption-2/extras/challenges/master-hunter-challenges" target="_blank" rel="noopener">Gamer Guides</a> and <a href="https://www.rdr2.org/wiki/challenges/" target="_blank" rel="noopener">rdr2.org</a>.</p>
+    <p>Ticks are saved in this browser on this device.</p>
+    <button class="reset" id="reset" type="button">Clear all ticks</button>
+  </div>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="Sections">
+  <button role="tab" id="tabN" data-tab="n" aria-selected="true">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-6.5 7-6.5s7 2.6 7 6.5"/></svg>
+    NPCs
+  </button>
+  <button role="tab" id="tabM" data-tab="m" aria-selected="false">
+    <svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M3.5 6l1.5 1.5L7.5 4.5M3.5 12l1.5 1.5L7.5 10.5M3.5 18l1.5 1.5L7.5 16.5"/></svg>
+    Materials
+  </button>
+  <button role="tab" id="tabC" data-tab="c" aria-selected="false">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg>
+    Challenges
+  </button>
+</nav>
+
+<script>
+(function(){
+"use strict";
+var KEY="trappers-ledger-v2";
+
+/* ---------- Recipes: "Name: Material; Material x2" ---------- */
+var GROUPS=[
+["Trapper · Perfect hides",
+"Alligator Ranch Cutter Saddle: Perfect Alligator Skin\n"+
+"Badger Mountain Hat: Perfect Badger Pelt\n"+
+"Badger Rifleman Gloves: Perfect Badger Pelt\n"+
+"Batwing Chaps: Perfect Deer Pelt\n"+
+"Bear Batwing Chaps: Perfect Bear Pelt\n"+
+"Bear Dakota Saddle: Perfect Bear Pelt\n"+
+"Bear Fringed Shotgun Chaps: Perfect Black Bear Pelt\n"+
+"Bear Grenadier Hat: Perfect Black Bear Pelt\n"+
+"Beaver Drifter Hat: Perfect Beaver Pelt x2\n"+
+"Beaver Hunting Jacket: Perfect Cow Hide; Perfect Beaver Pelt x2\n"+
+"Beaver Mountain Hat: Perfect Beaver Pelt\n"+
+"Beaver Roping Saddle: Perfect Beaver Pelt\n"+
+"Billy Vest: Perfect Armadillo Skin x2; Perfect Goat Hide\n"+
+"Bison Gambler's Hat: Perfect Bison Pelt; Robin Feather x4; Oriole Feather x4\n"+
+"Boar & Bull Fowler Boots: Perfect Ox Hide; Perfect Boar Pelt\n"+
+"Boar Fringed Shotgun Chaps: Perfect Boar Pelt x2\n"+
+"Boar Mother Hubbard Saddle: Perfect Boar Pelt\n"+
+"Boar Riding Gloves: Perfect Boar Pelt; Perfect Rabbit Pelt x2\n"+
+"Buck Riding Gloves: Perfect Buck Pelt\n"+
+"Bull Fowler Boots: Perfect Boar Pelt; Perfect Bull Hide\n"+
+"Bull Fringed Shotgun Chaps: Perfect Bull Hide\n"+
+"Cougar Cutaway Coat: Perfect Cougar Pelt x2; Perfect Black Bear Pelt\n"+
+"Cougar McClelland Saddle: Perfect Cougar Pelt\n"+
+"Country Vest: Perfect Buck Pelt; Perfect Beaver Pelt\n"+
+"Coyote Gambler's Hat: Perfect Coyote Pelt x2\n"+
+"Coyote Scout Jacket: Perfect Ox Hide; Perfect Coyote Pelt\n"+
+"Deer Cavalry Hat: Perfect Deer Pelt; Raven Feather x10\n"+
+"Deer Pelt Half Chaps: Perfect Deer Pelt\n"+
+"Elk Flop Hat: Perfect Elk Pelt\n"+
+"Elk Fringed Shotgun Chaps: Perfect Elk Pelt\n"+
+"Elk Riding Gloves: Perfect Elk Pelt\n"+
+"Fox Mountain Hat: Perfect Fox Pelt\n"+
+"Gila Monster Gambler's Hat: Perfect Elk Pelt; Perfect Gila Monster Skin\n"+
+"Goat Flop Hat: Perfect Pronghorn Hide; Perfect Goat Hide\n"+
+"Grenadier Hat: Perfect Muskrat Pelt; Perfect Beaver Pelt\n"+
+"Hinterland Vest: Perfect Ram Hide\n"+
+"Huntsman Vest: Perfect Sheep Hide; Perfect Deer Pelt\n"+
+"Iguana Big Valley Hat: Perfect Cow Hide; Perfect Iguana Skin\n"+
+"Iguana Range Gloves: Perfect Collared Peccary Pelt; Perfect Iguana Skin x2\n"+
+"Javelina Half Chaps: Perfect Collared Peccary Pelt; Perfect Snake Skin\n"+
+"Javelina Moccasins: Perfect Collared Peccary Pelt x2\n"+
+"Moccasins: Perfect Buck Pelt\n"+
+"Moose Batwing Chaps: Perfect Moose Pelt\n"+
+"Moose Half Chaps: Perfect Moose Pelt\n"+
+"Moose Range Gloves: Perfect Moose Pelt\n"+
+"Muskrat Cavalry Hat: Perfect Rabbit Pelt x4; Perfect Muskrat Pelt\n"+
+"Muskrat Half Chaps: Perfect Muskrat Pelt x2\n"+
+"No-Man's Vest: Perfect Panther Pelt; Perfect Goat Hide\n"+
+"Outdoorsmen Vest: Perfect Pronghorn Hide\n"+
+"Ox Fringed Shotgun Chaps: Perfect Ox Hide\n"+
+"Panther Trail Saddle: Perfect Panther Pelt\n"+
+"Pigskin Rifleman Gloves: Perfect Pig Hide\n"+
+"Plantation Slouch Hat: Perfect Bison Pelt\n"+
+"Principal Vest: Perfect Cow Hide; Perfect Deer Pelt\n"+
+"Pronghorn Flop Hat: Perfect Pronghorn Hide; Perfect Opossum Pelt x4\n"+
+"Pronghorn Half Chaps: Perfect Pronghorn Hide\n"+
+"Raccoon Mountain Hat: Perfect Raccoon Pelt; Perfect Beaver Pelt; Hawk Feather x2\n"+
+"Ram Shotgun Coat: Perfect Ram Hide x2\n"+
+"Ram Sombrero: Perfect Ram Hide\n"+
+"Rat Flat Cap: Perfect Rat Pelt x10\n"+
+"Rat Infantry Hardee Hat: Perfect Goat Hide; Perfect Rat Pelt x6\n"+
+"Rattlesnake Vaquero Saddle: Perfect Snake Skin x10\n"+
+"Rugged Wrangler Vest: Perfect Pig Hide\n"+
+"Rustic Vest: Perfect Cougar Pelt\n"+
+"Sheep Batwing Chaps: Perfect Sheep Hide x2\n"+
+"Sheepskin Vest: Perfect Sheep Hide x2\n"+
+"Skunk Mountain Hat: Perfect Skunk Pelt\n"+
+"Skunk Trapper Boots: Perfect Skunk Pelt x2\n"+
+"Snake Bulldogger Hat: Perfect Sheep Hide; Perfect Snake Skin\n"+
+"Snake Skin Cavalry Gloves: Perfect Boar Pelt; Perfect Snake Skin\n"+
+"Squirrel Flat Cap: Perfect Squirrel Pelt x6\n"+
+"Trapper's Cloak: Perfect Sheep Hide\n"+
+"Two Toned Moccasins: Perfect Buck Pelt\n"+
+"Wilderness Vest: Perfect Wolf Pelt; Perfect Panther Pelt\n"+
+"Winter Cavalry Gloves: Perfect Rabbit Pelt; Perfect Muskrat Pelt x2\n"+
+"Wolf Coat: Perfect Ram Hide; Perfect Wolf Pelt\n"+
+"Workman's Pride Boots: Perfect Cow Hide; Perfect Goat Hide"],
+["Trapper · Legendary",
+"Legendary Alligator Fowlers: Legendary Alligator Skin\n"+
+"Legendary Alligator Gambler's Hat: Legendary Alligator Skin; Perfect Snake Skin x2\n"+
+"Legendary Alligator Vest: Legendary Alligator Skin\n"+
+"Legendary Bear Coat: Legendary Bear Pelt; Perfect Bison Pelt\n"+
+"Legendary Bear Head Hat: Legendary Bear Pelt\n"+
+"Legendary Bear Roper: Legendary Bear Pelt; Perfect Bull Hide\n"+
+"Legendary Beaver Cavalry Gloves: Legendary Beaver Pelt\n"+
+"Legendary Beaver Flop Hat: Legendary Beaver Pelt; Legendary Boar Pelt; Cardinal Feather\n"+
+"Legendary Bison Batwing Chaps: Legendary Tatanka Bison Pelt\n"+
+"Legendary Bison Vest: Legendary Tatanka Bison Pelt\n"+
+"Legendary Boar & Bison Fowlers: Legendary Boar Pelt; Legendary Tatanka Bison Pelt\n"+
+"Legendary Buck & Fox Range Gloves: Legendary Buck Pelt; Legendary Fox Pelt\n"+
+"Legendary Buck Vest: Legendary Buck Pelt; Perfect Ram Hide\n"+
+"Legendary Cougar Flop Hat: Legendary Cougar Pelt; Turkey Feather x2\n"+
+"Legendary Cougar Riding Gloves: Legendary Cougar Pelt; Perfect Boar Pelt\n"+
+"Legendary Cougar/Wolf Vest: Legendary Cougar Pelt; Legendary Wolf Pelt\n"+
+"Legendary Coyote Half Chaps: Legendary Coyote Pelt; Perfect Fox Pelt x2\n"+
+"Legendary Coyote Mountain Hat: Legendary Coyote Pelt; Eagle Feather x2\n"+
+"Legendary Elk Half Chaps: Legendary Elk Pelt; Perfect Sheep Hide\n"+
+"Legendary Elk Moccasins: Legendary Elk Pelt; Perfect Goat Hide\n"+
+"Legendary Elk Range Gloves: Legendary Elk Pelt\n"+
+"Legendary Fox Moccasins: Perfect Elk Pelt; Legendary Fox Pelt\n"+
+"Legendary Moose Hunting Jacket: Legendary Moose Pelt; Perfect Wolf Pelt\n"+
+"Legendary Moose Moccasins: Legendary Moose Pelt; Perfect Cow Hide\n"+
+"Legendary Panther Cloak: Legendary Panther Pelt\n"+
+"Legendary Panther Range Gloves: Legendary Panther Pelt; Perfect Gila Monster Skin\n"+
+"Legendary Pronghorn Coat: Legendary Pronghorn Hide; Perfect Moose Pelt\n"+
+"Legendary Pronghorn Range Gloves: Legendary Pronghorn Hide; Perfect Muskrat Pelt\n"+
+"Legendary Ram Batwing Chaps: Legendary Ram Hide\n"+
+"Legendary Ram Hat: Legendary Ram Hide\n"+
+"Legendary Ram Rifleman Gloves: Legendary Ram Hide; Perfect Boar Pelt\n"+
+"Legendary White Bison Coat: Legendary White Bison Pelt\n"+
+"Legendary White Bison Hat: Legendary White Bison Pelt\n"+
+"Legendary Wolf Batwing Chaps: Legendary Wolf Pelt; Perfect Goat Hide"],
+["Trapper · Feather accessories",
+"Glorious Accessory: Oriole Feather; Woodpecker Feather x4\n"+
+"Homestead Accessory: Chicken Feather; Goose Feather x2\n"+
+"Huntsman Accessory: Perfect Boar Pelt; Hawk Feather; Quail Feather x2\n"+
+"Judicious Accessory: Pheasant Feather; Owl Feather\n"+
+"Majestic Accessory: Rooster Feather x4; Woodpecker Feather x2; Songbird Feather x2\n"+
+"Native Accessory: Pheasant Feather; Sparrow Feather x4; Robin Feather x3\n"+
+"Pilgrim Accessory: Turkey Feather; Cedar Waxwing Feather x2; Blue Jay Feather x3\n"+
+"Pioneer Accessory: Turkey Feather x3; Duck Feather x3; Chicken Feather x3\n"+
+"Pursuer Accessory: Eagle Feather x2; Pigeon Feather x2\n"+
+"Rococo Accessory: Crow Feather x2; Cardinal Feather x2\n"+
+"Scavenger Accessory: Vulture Feather; Seagull Feather\n"+
+"Stalker Accessory: Loon Feather x2; Condor Feather; Raven Feather x3"],
+["Pearson · Satchel upgrades",
+"Valuables Satchel: Perfect Beaver Pelt; Perfect Rabbit Pelt; Perfect Deer Pelt\n"+
+"Materials Satchel: Perfect Boar Pelt; Perfect Iguana Skin; Perfect Deer Pelt\n"+
+"Provisions Satchel: Perfect Bison Pelt; Perfect Raccoon Pelt; Perfect Deer Pelt\n"+
+"Kit Satchel: Perfect Elk Pelt; Perfect Panther Pelt; Perfect Deer Pelt\n"+
+"Ingredients Satchel: Perfect Badger Pelt; Perfect Squirrel Carcass; Perfect Deer Pelt\n"+
+"Tonics Satchel: Perfect Buck Pelt; Perfect Elk Pelt; Perfect Deer Pelt\n"+
+"Legend of the East Satchel: Perfect Wolf Pelt; Perfect Cougar Pelt; Perfect Deer Pelt"],
+["Pearson · Camp upgrades",
+"Alligator Skull: Perfect Alligator Skin\n"+
+"Big Horn Ram Skull: Perfect Ram Carcass\n"+
+"Cougar Pelt Covered Chest: Perfect Cougar Pelt x2\n"+
+"Boar Skin Table Cover: Perfect Boar Pelt\n"+
+"Ox Hide Rug: Perfect Ox Hide x2\n"+
+"Boar Skin Rug: Perfect Boar Pelt x4\n"+
+"Pronghorn Leather Table Tops: Perfect Pronghorn Hide x2\n"+
+"Pronghorn Skull: Perfect Pronghorn Carcass\n"+
+"Moose Antlers: Moose Antler\n"+
+"Wolf Skull: Perfect Wolf Carcass\n"+
+"Snake Skin Banjo Head: Perfect Snake Skin x2\n"+
+"Campfire Seat Cover: Perfect Beaver Pelt; Perfect Muskrat Pelt; Perfect Fox Pelt\n"+
+"Campfire Log Seat Cover: Perfect Wolf Pelt x2\n"+
+"Lean-to Cow Hide Ground Cover: Perfect Cow Hide\n"+
+"Scout Fire Ground Cover: Perfect Goat Hide x2\n"+
+"Elk Antlers: Elk Antler\n"+
+"Hanging Bones: Buck Antler"]
+];
+
+/* ---------- Where to find each material: [text, confirmed] ---------- */
+var ELK="Ambarino (forested areas) and north of Annesburg in northeastern New Hanover. Rocky Mountain bull or cow elk.";
+var BUCK="Whitetail buck: northern New Hanover near the Ambarino border, the Lemoyne plains, and the road between Van Horn Trading Post and Annesburg.";
+var PRONG="New Hanover near the \"New\" label and Flat Iron Lake, and west of Hanging Dog Ranch near the lavender fields.";
+var RAM="Rocky Mountain bighorn ram in the Grizzlies (between the A and R of Ambarino, and on the N). Also near Cattail Pond by the railway, south of Cumberland Falls.";
+var SQUIRREL="Forests of West Elizabeth and New Hanover, especially the big forest north of Annesburg.";
+var WOLF="Ambarino, and the intersection near Hanging Dog Ranch at night.";
+var WHERE={
+"Perfect Alligator Skin":["Swamps around Saint Denis (Bayou Nwa).",1],
+"Perfect Armadillo Skin":["Around the town of Armadillo in New Austin. Only after the story ends (Epilogue).",1],
+"Perfect Badger Pelt":["Behind the trapper at Riggs Station.",1],
+"Perfect Bear Pelt":["Grizzly bear: Grizzlies East, northwest of Wallace Station.",1],
+"Perfect Black Bear Pelt":["Not confirmed in my sources. Try forested hills such as Roanoke Ridge, Cumberland Forest and Big Valley, and track a three-star bear.",0],
+"Perfect Beaver Pelt":["Between the E and R of New Hanover on the map, west of the A in Ambarino, and Owanjila Lake (2 to 3 star beavers).",1],
+"Perfect Bison Pelt":["West of Blackwater, and the Heartlands Overflow southwest of Annesburg.",1],
+"Perfect Boar Pelt":["Forested areas across Lemoyne. Also common in West Elizabeth.",1],
+"Perfect Buck Pelt":[BUCK,1],
+"Perfect Bull Hide":["Three spots: north of the first E in West Elizabeth, north of the H in New Hanover, and east of Lagras (north of Saint Denis). Also ranches such as Hanging Dog Ranch.",1],
+"Perfect Collared Peccary Pelt":["New Austin, south of the \"New\" label. Epilogue only.",1],
+"Perfect Cougar Pelt":["South of Blackwater and southwest of Flat Iron Lake. In New Austin after Chapter 6: northwest of the A and south of Tumbleweed.",1],
+"Perfect Cow Hide":["Ranches in every region. Good spots: north of Saint Denis near the coast, and Painted Sky ranch in New Hanover.",1],
+"Perfect Coyote Pelt":["California Valley coyote: Lemoyne and eastern New Hanover.",1],
+"Perfect Deer Pelt":["Open grassland between Rhodes and Bolger Glade. Also around Valentine and across Lemoyne, New Hanover and Ambarino.",1],
+"Perfect Elk Pelt":[ELK,1],
+"Perfect Fox Pelt":["Forests in Ambarino and Lemoyne. Red fox at Cumberland Forest. Silver foxes only at night in woodland.",1],
+"Perfect Gila Monster Skin":["New Austin deserts, east of Armadillo. Epilogue only.",1],
+"Perfect Goat Hide":["North of Saint Denis near the coast, and Larned Sod ranch in New Hanover.",1],
+"Perfect Iguana Skin":["Northern end of the island east of Flat Iron Lake. Desert iguanas in New Austin after the story. One guide also lists the island west of Rhodes.",1],
+"Perfect Moose Pelt":["Between the I and N of Ambarino, the northeast corner of the map, and west of Blackwater.",1],
+"Perfect Muskrat Pelt":["Dewberry Creek in Lemoyne. Use the Varmint Rifle.",1],
+"Perfect Opossum Pelt":["Between the R and I of Ambarino, north of Annesburg, and the north shore of Flat Iron Lake. Use the Varmint Rifle.",1],
+"Perfect Ox Hide":["Ranches and farms in West Elizabeth, New Hanover and Lemoyne. Small ranch northwest of Van Horn Trading Post.",1],
+"Perfect Panther Pelt":["Lemoyne wetlands south of Bolger Glade near the Lannaheche River, and woods near Braithwaite Manor and Old Harry's Fen at night.",1],
+"Perfect Pig Hide":["Farms, ranches and towns in New Hanover, and east of Saint Denis.",1],
+"Perfect Pronghorn Hide":[PRONG,1],
+"Perfect Pronghorn Carcass":[PRONG,1],
+"Perfect Rabbit Pelt":["Near Valentine, Strawberry, Rhodes and Saint Denis. Varmint Rifle only.",1],
+"Perfect Raccoon Pelt":["Forests of Lemoyne, New Hanover and West Elizabeth. Varmint Rifle only.",1],
+"Perfect Ram Hide":[RAM,1],
+"Perfect Ram Carcass":[RAM,1],
+"Perfect Rat Pelt":["Saint Denis and other populated areas, and Armadillo in New Austin.",1],
+"Perfect Sheep Hide":["Bighorn sheep in the Grizzlies. Sierra Nevada bighorn all over New Austin and parts of West Elizabeth and Ambarino.",1],
+"Perfect Skunk Pelt":["Near Rhodes, Braithwaite Manor, Caliga Hall, Annesburg, western New Hanover and west of Blackwater.",1],
+"Perfect Snake Skin":["Road between Saint Denis, Van Horn and Annesburg, swamps north of Saint Denis, water snakes at Lagras. Rattlesnakes in Lemoyne, New Hanover and West Elizabeth.",1],
+"Perfect Squirrel Pelt":[SQUIRREL,1],
+"Perfect Squirrel Carcass":[SQUIRREL,1],
+"Perfect Wolf Pelt":[WOLF,1],
+"Perfect Wolf Carcass":[WOLF,1],
+"Elk Antler":[ELK,1],
+"Buck Antler":[BUCK,1],
+"Moose Antler":["Spawn points before the Epilogue (for example Cairne Lake, near Colter). Tall Trees in New Austin afterward.",1],
+"Robin Feather":["American robin: most regions, including near Braithwaite Manor and Fort Riggs.",1],
+"Oriole Feather":["Baltimore oriole in Ambarino, New Hanover and north of Rhodes. Hooded oriole in West Elizabeth and the river west of Valentine.",1],
+"Woodpecker Feather":["Pileated woodpecker in New Hanover forests. Red-bellied woodpecker near Roanoke Ridge.",1],
+"Raven Feather":["Western raven: mostly the west, often west of Blackwater.",1],
+"Chicken Feather":["Ranches in every region, and the Heartlands near Blackwater.",1],
+"Goose Feather":["Canada goose: New Hanover, Lemoyne and eastern West Elizabeth, near Flat Iron Lake.",1],
+"Hawk Feather":["Eastern New Hanover, northeast of Flat Iron Lake, and across New Austin after Chapter 6.",1],
+"Quail Feather":["California quail: New Austin, and northeast of Blackwater in New Hanover.",1],
+"Pheasant Feather":["Grasslands of New Hanover and West Elizabeth. Good spot: southwest of Valentine.",1],
+"Owl Feather":["Horned owls in New Austin and west of Blackwater. Coastal horned owls at night near water.",1],
+"Turkey Feather":["Forests and light vegetation in West Elizabeth, New Hanover and Lemoyne, around Valentine and Rhodes.",1],
+"Duck Feather":["Mallard and Pekin ducks: Lemoyne swamps, the river southwest of Valentine, east of Annesburg.",1],
+"Cardinal Feather":["Southwest of Valentine, near Van Horn, and the forests north of Rhodes.",1],
+"Eagle Feather":["Golden eagle: between the R and I in Ambarino, and between the V and E in New Hanover.",1],
+"Pigeon Feather":["Rock pigeon in nearly every region. Good spot: the rocks in Dakota River north of Bard's Crossing.",1],
+"Songbird Feather":["Western or scarlet tanager: forests of Lemoyne, New Hanover and West Elizabeth, and Braithwaite Manor grounds.",1],
+"Rooster Feather":["Ranches in every region, the north shore of Flat Iron Lake, and west of Van Horn.",1],
+"Crow Feather":["Not confirmed in my sources. Crows turn up across many regions; check the in-game map.",0],
+"Sparrow Feather":["Grasslands of West Elizabeth and New Hanover, around Strawberry, north of Valentine, and Braithwaite Manor.",1],
+"Cedar Waxwing Feather":["Northwest shore of Flat Iron Lake and the grounds of Braithwaite Manor.",1],
+"Blue Jay Feather":["South of Valentine, and around Rhodes and Annesburg.",1],
+"Loon Feather":["Water in West Elizabeth, New Hanover and Ambarino. Strong spots: the island east of Flat Iron Lake and Owanjila Lake.",1],
+"Condor Feather":["California condor: around Tumbleweed in New Austin.",1],
+"Vulture Feather":["West Elizabeth, New Hanover, Lemoyne and New Austin.",1],
+"Seagull Feather":["Near water: Bluewater Marsh, the northwest shore of Flat Iron Lake, Saint Denis docks."  ,1]
+};
+var LEG_GENERIC="Use the legendary animals map to find the marked zone. Ride in until \"You have entered Legendary Animal Territory\" appears, then follow the yellow clues with Eagle Eye. If nothing triggers, camp, sleep, ride away and come back.";
+var LEG={
+"Legendary Bear Pelt":"Bharati Grizzly bear. Unlocked in Chapter 2 by Hosea's hunt; you can back out and return later.",
+"Legendary Panther Pelt":"Giaguaro: south of Rhodes near Bolger Glade. Only spawns after you complete 9 Master Hunter Challenges.",
+"Legendary Alligator Skin":"Reportedly needs Chapter 4 finished (unconfirmed)."
+};
+
+/* ---------- Build data ---------- */
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+function catOf(n){
+  if(n.indexOf("Legendary")===0)return"Legendary";
+  if(n.indexOf("Perfect")===0)return"Perfect hides and pelts";
+  if(n.indexOf("Feather")>-1)return"Feathers";
+  return"Antlers";
+}
+var CATS=["Perfect hides and pelts","Legendary","Feathers","Antlers"];
+var mats={},matList=[],recipes=[];
+function getMat(n){
+  if(!mats[n]){mats[n]={id:slug(n),name:n,cat:catOf(n),uses:[]};matList.push(mats[n]);}
+  return mats[n];
+}
+GROUPS.forEach(function(g){
+  g[1].split("\n").forEach(function(line){
+    var i=line.indexOf(":");
+    var name=line.slice(0,i).trim();
+    var parts=line.slice(i+1).split(";").map(function(s){
+      var m=s.trim().match(/^(.*?)(?:\s+x(\d+))?$/);
+      return{m:getMat(m[1]),q:+(m[2]||1)};
+    });
+    var gp=g[0].split(" · ");var r={id:slug(g[0]+" "+name),name:name,group:g[0],npc:gp[0],sub:gp[1]||"",parts:parts};
+    recipes.push(r);
+    parts.forEach(function(p){p.m.uses.push({r:r,q:p.q})});
+  });
+});
+function info(m){
+  if(WHERE[m.name])return{t:WHERE[m.name][0],ok:!!WHERE[m.name][1]};
+  if(m.cat==="Legendary")return{t:(LEG[m.name]?LEG[m.name]+" ":"")+LEG_GENERIC,ok:!LEG[m.name]||m.name!=="Legendary Alligator Skin"};
+  return{t:"Not listed yet. Check the in-game map.",ok:false};
+}
+var byId={};matList.forEach(function(m){byId[m.id]=m});
+var recById={};recipes.forEach(function(r){recById[r.id]=r});
+
+/* ---------- NPCs ---------- */
+var NPCS=[
+{id:"Trapper",title:"Trapper",blurb:"Takes only perfect pelts and hides, and favors legendary ones. Five spots: Saint Denis (west bank of the Lannaheche River, the first one you meet); central New Hanover, southwest of Annesburg near the Elysian Pool; West Elizabeth outside Riggs Station; West Elizabeth near Manzanita Post; and southwest of Pronghorn Ranch, north of Owanjila Lake."},
+{id:"Pearson",title:"Pearson (camp cook)",blurb:"Crafts at camp, but only after you buy the Leather Working Tools camp upgrade ($180). Satchel upgrades and camp decorations."}
+];
+
+/* ---------- Challenges: [track, rank, title, goal, how] ---------- */
+var TRACKS=["Master Hunter","Survivalist","Sharpshooter","Horseman","Weapons Expert"];
+var CH_RAW=[
+["Master Hunter",1,"Skin 3 deer",3,"Kill and skin 3 deer. They roam Lemoyne, New Hanover and Ambarino; the grassland between Rhodes and Bolger Glade is a good spot."],
+["Master Hunter",2,"Collect 3 perfect rabbit pelts",3,"Use the Varmint Rifle or a small game arrow to the head. Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."],
+["Master Hunter",3,"Track 10 different species with binoculars",10,"Study each animal through the binoculars, then hold the button to track it. You need 10 different species."],
+["Master Hunter",4,"Call an animal and kill it cleanly, 5 times",5,"Sneak up on an animal, call it over, then kill it with a Dead Eye headshot."],
+["Master Hunter",5,"Skin 3 black or grizzly bears",3,"Grizzly: Grizzlies East, northwest of Wallace Station. Bring plenty of ammo and aim for the head."],
+["Master Hunter",6,"Kill and skin 5 cougars with a bow only",5,"Cougars: south of Blackwater and southwest of Flat Iron Lake, and in New Austin after Chapter 6. One guide also places them in the northern mountains."],
+["Master Hunter",7,"Lure and kill one herbivore and one predator with bait",2,"Craft bait from meat in the crafting menu, scatter it, wait for the animal to come, then kill it. One herbivore and one predator."],
+["Master Hunter",8,"Catch 3 fish without a fishing rod",3,"Spot fish in the water and shoot them with a bow."],
+["Master Hunter",9,"Catch an opossum playing dead",1,"Chase it until it faints, then pick it up quickly. Opossums: between the R and I of Ambarino, north of Annesburg, and the north shore of Flat Iron Lake."],
+["Master Hunter",10,"Find and kill the legendary panther Giaguaro",1,"South of Rhodes near Bolger Glade. It only spawns after you complete 9 Master Hunter challenges."],
+["Survivalist",2,"Hand in 5 animals to camp or a Trapper",5,"Bring carcasses or pelts to your camp or to a Trapper."],
+["Survivalist",3,"Kill 5 animals with the Varmint Rifle",5,"Small game is easiest: rabbits, squirrels, raccoons and similar."],
+["Survivalist",6,"Kill a scavenging animal while it feeds on a corpse, 5 times",5,"Wait for a scavenger to start feeding on a body, then shoot it."],
+["Survivalist",7,"Kill 8 small game animals with consecutive small game arrows",8,"Every shot must be a small game arrow and must kill, or the streak breaks."],
+["Sharpshooter",1,"Kill 3 flying birds",3,"Any flying birds count."],
+["Sharpshooter",2,"Kill 2 different species in one Dead Eye",2,"Mark two different animals in a single Dead Eye use."],
+["Sharpshooter",3,"Kill 5 flying birds from a moving train",5,"Shoot birds while riding a train."],
+["Sharpshooter",5,"Kill 6 animals without switching or reloading",6,"Use a weapon with enough ammo, and do not switch or reload between kills."],
+["Sharpshooter",10,"Kill 3 flying birds with 3 consecutive long scoped rifle shots",3,"Use a long-range scoped rifle and do not miss."],
+["Horseman",1,"Kill 5 rabbits from horseback",5,"Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."],
+["Horseman",5,"Trample 5 animals on horseback",5,"Ride over animals until they are trampled."],
+["Horseman",7,"Kill 7 enemies from horseback without dismounting",7,"Human enemies, for example during a bounty or camp attack."],
+["Horseman",8,"Kill 9 predators from horseback",9,"Wolves, cougars, bears and similar."],
+["Weapons Expert",3,"Kill 3 birds of prey with a tomahawk only",3,"Hawks, eagles and owls. Throw the tomahawk."],
+["Weapons Expert",9,"Kill 9 unaware enemies from behind with a bow",9,"Human enemies who have not noticed you."],
+["Weapons Expert",10,"Kill a grizzly bear with throwing knives only, taking no damage",1,"Grizzly: Grizzlies East, northwest of Wallace Station."]
+];
+var chals=CH_RAW.map(function(c){return{id:slug(c[0]+" "+c[1]),track:c[0],rank:c[1],title:c[2],goal:c[3],hint:c[4]}});
+var chById={};chals.forEach(function(c){chById[c.id]=c});
+
+/* ---------- State ---------- */
+var store={have:{},done:{},cdone:{},prog:{}};
+try{var s0=JSON.parse(localStorage.getItem(KEY)||"null");if(s0&&s0.have&&s0.done){store.have=s0.have;store.done=s0.done;store.cdone=s0.cdone||{};store.prog=s0.prog||{}}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+var ui={tab:"n",q:"",sn:"todo",sm:"missing",sc:"open",open:{},npc:{}};
+var SEGKEY={n:"sn",m:"sm",c:"sc"};
+try{var u=JSON.parse(localStorage.getItem(KEY+"-ui")||"null");if(u){if(u.tab==="m"||u.tab==="c")ui.tab=u.tab;if(u.sn)ui.sn=u.sn;if(u.sm)ui.sm=u.sm;if(u.sc)ui.sc=u.sc}}catch(e){}
+function saveUi(){try{localStorage.setItem(KEY+"-ui",JSON.stringify({tab:ui.tab,sn:ui.sn,sm:ui.sm,sc:ui.sc}))}catch(e){}}
+
+/* ---------- Helpers ---------- */
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+var CHECK='<svg viewBox="0 0 16 16" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+var CHEV='<svg class="chev" viewBox="0 0 18 18" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l5 5 5-5"/></svg>';
+function cb(checked,act,idAttr,label){
+  return'<button class="cb" type="button" role="checkbox" aria-checked="'+(checked?"true":"false")+'" aria-label="'+esc(label)+'" data-act="'+act+'" '+idAttr+'><span class="box">'+CHECK+'</span></button>';
+}
+function need(m){var n=0;m.uses.forEach(function(x){if(!store.done[x.r.id])n+=x.q});return n}
+function needCount(m){var n=0;m.uses.forEach(function(x){if(!store.done[x.r.id])n++});return n}
+function haveParts(r){var h=0;r.parts.forEach(function(p){if(store.have[p.m.id])h++});return h}
+function matchQ(text){return!ui.q||text.toLowerCase().indexOf(ui.q.toLowerCase())>-1}
+function emptyMsg(a,b){return'<div class="empty"><b>'+esc(a)+'</b>'+esc(b)+'</div>'}
+
+/* ---------- Render: NPCs ---------- */
+function passesR(r){
+  var done=!!store.done[r.id],ready=haveParts(r)===r.parts.length;
+  if(ui.sn==="todo"&&done)return false;
+  if(ui.sn==="ready"&&!(ready&&!done))return false;
+  if(ui.sn==="done"&&!done)return false;
+  return matchQ(r.name+" "+r.npc+" "+r.sub+" "+r.parts.map(function(p){return p.m.name}).join(" "));
+}
+function recipeRow(r){
+  var done=!!store.done[r.id],hp=haveParts(r),ready=hp===r.parts.length,key="r:"+r.id,open=!!ui.open[key];
+  return'<li class="row'+(done?" done":"")+(open?" open":"")+'" data-key="'+key+'">'+
+    cb(done,"done",'data-rid="'+r.id+'"',"Crafted "+r.name)+
+    '<button class="main" type="button" data-act="open" data-key="'+key+'" aria-expanded="'+open+'"><span class="txt"><span class="nm">'+esc(r.name)+'</span><span class="sub">'+
+    (done?"Crafted":hp+" of "+r.parts.length+" materials")+'</span></span>'+
+    (!done&&ready?'<span class="pill on">Ready</span>':'')+CHEV+'</button>'+
+    '<div class="more"'+(open?"":" hidden")+'>'+
+    r.parts.map(function(p){
+      var inf=info(p.m);
+      return'<div class="mrow">'+cb(!!store.have[p.m.id],"have",'data-mid="'+p.m.id+'"',"Have "+p.m.name)+
+        '<div class="mb"><div class="mn"><span>'+esc(p.m.name)+'</span><span>×'+p.q+'</span></div>'+
+        '<div class="mw">'+(inf.ok?"":'<span class="warn">Unconfirmed</span> ')+esc(inf.t)+'</div></div></div>';
+    }).join("")+'</div></li>';
+}
+function viewN(){
+  var out="",any=false;
+  NPCS.forEach(function(n){
+    var all=recipes.filter(function(r){return r.npc===n.id});
+    var crafted=0,ready=0;
+    all.forEach(function(r){if(store.done[r.id])crafted++;else if(haveParts(r)===r.parts.length)ready++});
+    var list=all.filter(passesR);
+    if(ui.q&&!list.length)return;
+    any=true;
+    var open=ui.npc[n.id]!==false||!!ui.q;
+    out+='<section class="npc"><button type="button" class="npc-h" data-act="npc" data-npc="'+n.id+'" aria-expanded="'+open+'"><span class="txt"><span class="npc-n">'+esc(n.title)+'</span><span class="sub">'+crafted+' of '+all.length+' crafted · '+ready+' ready</span></span>'+CHEV+'</button>';
+    if(open){
+      out+='<p class="npc-b">'+esc(n.blurb)+'</p>';
+      if(!list.length){out+='<div class="empty">Nothing here for this filter.</div>'}
+      else{
+        var subs=[],by={};
+        list.forEach(function(r){if(!by[r.sub]){by[r.sub]=[];subs.push(r.sub)}by[r.sub].push(r)});
+        subs.forEach(function(sg){out+='<div class="sec"><span>'+esc(sg)+'</span><span>'+by[sg].length+'</span></div><ul>'+by[sg].map(recipeRow).join("")+'</ul>'});
+      }
+    }
+    out+='</section>';
+  });
+  return any?out:emptyMsg("No matches","Try a different word or filter.");
+}
+
+/* ---------- Render: materials ---------- */
+function viewM(){
+  var rows={};CATS.forEach(function(c){rows[c]=[]});
+  var shown=0;
+  matList.forEach(function(m){
+    var n=need(m),h=!!store.have[m.id],inf=info(m);
+    if(ui.sm==="missing"&&!(n>0&&!h))return;
+    if(ui.sm==="have"&&!h)return;
+    if(!matchQ(m.name+" "+inf.t+" "+m.cat))return;
+    rows[m.cat].push(m);shown++;
+  });
+  if(!shown)return emptyMsg(ui.sm==="missing"&&!ui.q?"Nothing left to find":"No matches",ui.sm==="missing"&&!ui.q?"Every needed material is ticked off.":"Try a different word or filter.");
+  var out="";
+  CATS.forEach(function(c){
+    var list=rows[c];if(!list.length)return;
+    list.sort(function(a,b){return a.name<b.name?-1:1});
+    out+='<div class="sec"><span>'+esc(c)+'</span><span>'+list.length+'</span></div><ul>';
+    list.forEach(function(m){
+      var h=!!store.have[m.id],n=need(m),key="m:"+m.id,open=!!ui.open[key],inf=info(m);
+      out+='<li class="row'+(h?" have":"")+(open?" open":"")+'" data-key="'+key+'">'+
+        cb(h,"have",'data-mid="'+m.id+'"',"Have "+m.name)+
+        '<button class="main" type="button" data-act="open" data-key="'+key+'" aria-expanded="'+open+'"><span class="txt"><span class="nm">'+esc(m.name)+'</span><span class="sub">'+
+        (n>0?"Need "+n+" · "+needCount(m)+(needCount(m)===1?" item":" items"):"Not needed now")+'</span></span>'+CHEV+'</button>'+
+        '<div class="more"'+(open?"":" hidden")+'>'+
+          '<div><p class="k">Where to find it</p>'+(inf.ok?"":'<span class="warn">Unconfirmed</span><br>')+'<p>'+esc(inf.t)+'</p></div>'+
+          '<div><p class="k">Used in</p><ul class="uses">'+
+          m.uses.map(function(x){return'<li'+(store.done[x.r.id]?' class="dim"':'')+'><span>'+esc(x.r.name)+'<small>'+esc(x.r.npc)+'</small></span><span>×'+x.q+'</span></li>'}).join("")+
+          '</ul></div></div></li>';
+    });
+    out+='</ul>';
+  });
+  return out;
+}
+
+/* ---------- Render: challenges ---------- */
+function chalSub(c){
+  var p=store.prog[c.id]||0;
+  return esc(c.track)+" "+c.rank+(c.goal>1?' · <span class="cs">'+p+" of "+c.goal+"</span>":"");
+}
+function chalRow(c){
+  var d=!!store.cdone[c.id],key="c:"+c.id,open=!!ui.open[key],p=store.prog[c.id]||0;
+  return'<li class="row'+(d?" done":"")+(open?" open":"")+'" data-key="'+key+'" data-cid="'+c.id+'">'+
+    cb(d,"cdone",'data-cid="'+c.id+'"',"Done "+c.title)+
+    '<button class="main" type="button" data-act="open" data-key="'+key+'" aria-expanded="'+open+'"><span class="txt"><span class="nm">'+esc(c.title)+'</span><span class="sub">'+chalSub(c)+'</span></span>'+CHEV+'</button>'+
+    '<div class="more"'+(open?"":" hidden")+'><div><p class="k">How</p><p>'+esc(c.hint)+'</p></div>'+
+    (c.goal>1?'<div class="ctr"><span class="k" style="margin:0">Progress</span><div class="step"><button type="button" data-act="dec" data-cid="'+c.id+'" aria-label="Minus one">−</button><span class="cnt">'+p+' / '+c.goal+'</span><button type="button" data-act="inc" data-cid="'+c.id+'" aria-label="Plus one">+</button></div></div>':'')+
+    '</div></li>';
+}
+function viewC(){
+  var by={},any=false;
+  chals.forEach(function(c){
+    var d=!!store.cdone[c.id];
+    if(ui.sc==="open"&&d)return;
+    if(ui.sc==="done"&&!d)return;
+    if(!matchQ(c.track+" "+c.title+" "+c.hint))return;
+    (by[c.track]=by[c.track]||[]).push(c);any=true;
+  });
+  if(!any)return emptyMsg(ui.sc==="open"&&!ui.q?"All challenges done":"No matches",ui.sc==="open"&&!ui.q?"Nothing left on this list.":"Try a different word or filter.");
+  var out="";
+  TRACKS.forEach(function(t){
+    var list=by[t];if(!list)return;
+    out+='<div class="sec"><span>'+esc(t)+'</span><span>'+list.length+'</span></div><ul>'+list.map(chalRow).join("")+'</ul>';
+  });
+  return out;
+}
+
+/* ---------- Chrome ---------- */
+var SEGS={
+  n:[["todo","To craft"],["ready","Ready"],["done","Crafted"]],
+  m:[["missing","Missing"],["have","Have"],["all","All"]],
+  c:[["open","Open"],["done","Done"],["all","All"]]
+};
+function renderSeg(){
+  var cur=ui[SEGKEY[ui.tab]];
+  $("seg").innerHTML=SEGS[ui.tab].map(function(s){
+    return'<button type="button" data-seg="'+s[0]+'" aria-pressed="'+(cur===s[0])+'">'+s[1]+'</button>';
+  }).join("");
+}
+function renderProgress(){
+  var l="",r="",pct=0;
+  if(ui.tab==="m"){
+    var total=0,have=0;
+    matList.forEach(function(m){if(need(m)>0){total++;if(store.have[m.id])have++}});
+    l="Have "+have+" of "+total+" materials";
+    var rd=0;recipes.forEach(function(x){if(!store.done[x.id]&&haveParts(x)===x.parts.length)rd++});
+    r=rd+" ready to craft";pct=total?have/total:0;
+  }else if(ui.tab==="n"){
+    var cr=0,rd2=0;
+    recipes.forEach(function(x){if(store.done[x.id])cr++;else if(haveParts(x)===x.parts.length)rd2++});
+    l="Crafted "+cr+" of "+recipes.length;r=rd2+" ready to craft";pct=recipes.length?cr/recipes.length:0;
+  }else{
+    var dn=0;chals.forEach(function(c){if(store.cdone[c.id])dn++});
+    l="Done "+dn+" of "+chals.length+" challenges";r="";pct=dn/chals.length;
+  }
+  $("progL").textContent=l;$("progR").textContent=r;
+  $("progBar").style.width=Math.round(pct*100)+"%";
+}
+function render(){
+  $("list").innerHTML=ui.tab==="n"?viewN():ui.tab==="m"?viewM():viewC();
+  ["N","M","C"].forEach(function(k){$("tab"+k).setAttribute("aria-selected",ui.tab===k.toLowerCase()?"true":"false")});
+  renderSeg();renderProgress();
+}
+
+/* ---------- Events ---------- */
+var timer=null;
+function later(){clearTimeout(timer);timer=setTimeout(render,450)}
+function setChal(c,n){
+  n=Math.max(0,Math.min(c.goal,n));
+  store.prog[c.id]=n;
+  if(n>=c.goal)store.cdone[c.id]=1;else delete store.cdone[c.id];
+  var row=document.querySelector('.row[data-cid="'+c.id+'"]');
+  if(row){
+    var cnt=row.querySelector(".cnt"),cs=row.querySelector(".cs"),box=row.querySelector('.cb[data-act="cdone"]');
+    if(cnt)cnt.textContent=n+" / "+c.goal;
+    if(cs)cs.textContent=n+" of "+c.goal;
+    if(box)box.setAttribute("aria-checked",store.cdone[c.id]?"true":"false");
+  }
+}
+$("list").addEventListener("click",function(e){
+  var t=e.target.closest("[data-act]");if(!t)return;
+  var act=t.getAttribute("data-act");
+  if(act==="npc"){
+    var nid=t.getAttribute("data-npc");
+    ui.npc[nid]=ui.npc[nid]===false;
+    render();return;
+  }
+  if(act==="open"){
+    var key=t.getAttribute("data-key");
+    ui.open[key]=!ui.open[key];
+    var row=t.closest(".row"),more=row.querySelector(".more");
+    row.classList.toggle("open",!!ui.open[key]);
+    more.hidden=!ui.open[key];
+    t.setAttribute("aria-expanded",!!ui.open[key]);
+    return;
+  }
+  if(act==="have"){
+    var id=t.getAttribute("data-mid");
+    if(store.have[id])delete store.have[id];else store.have[id]=1;
+    var on=!!store.have[id];
+    var els=document.querySelectorAll('[data-act="have"][data-mid="'+id+'"]');
+    for(var i=0;i<els.length;i++)els[i].setAttribute("aria-checked",on?"true":"false");
+  }else if(act==="done"){
+    var rid=t.getAttribute("data-rid");
+    if(store.done[rid])delete store.done[rid];else store.done[rid]=1;
+    t.setAttribute("aria-checked",store.done[rid]?"true":"false");
+  }else if(act==="cdone"){
+    var c=chById[t.getAttribute("data-cid")];
+    if(store.cdone[c.id]){setChal(c,Math.min(store.prog[c.id]||0,c.goal-1));delete store.cdone[c.id];if(c.goal===1)store.prog[c.id]=0;}
+    else setChal(c,c.goal);
+    var row2=document.querySelector('.row[data-cid="'+c.id+'"]');
+    if(row2){var b2=row2.querySelector('.cb[data-act="cdone"]');if(b2)b2.setAttribute("aria-checked",store.cdone[c.id]?"true":"false")}
+  }else if(act==="inc"||act==="dec"){
+    var c2=chById[t.getAttribute("data-cid")];
+    setChal(c2,(store.prog[c2.id]||0)+(act==="inc"?1:-1));
+  }
+  save();renderProgress();later();
+});
+$("seg").addEventListener("click",function(e){
+  var b=e.target.closest("[data-seg]");if(!b)return;
+  ui[SEGKEY[ui.tab]]=b.getAttribute("data-seg");
+  saveUi();render();
+});
+document.querySelector(".tabs").addEventListener("click",function(e){
+  var b=e.target.closest("[data-tab]");if(!b||b.getAttribute("data-tab")===ui.tab)return;
+  ui.tab=b.getAttribute("data-tab");saveUi();render();window.scrollTo(0,0);
+});
+$("q").addEventListener("input",function(){ui.q=this.value.trim();render()});
+var armTimer=null;
+$("reset").addEventListener("click",function(){
+  var b=this;
+  if(b.classList.contains("arm")){
+    store={have:{},done:{},cdone:{},prog:{}};save();
+    b.classList.remove("arm");b.textContent="Clear all ticks";render();return;
+  }
+  b.classList.add("arm");b.textContent="Tap again to clear everything";
+  clearTimeout(armTimer);
+  armTimer=setTimeout(function(){b.classList.remove("arm");b.textContent="Clear all ticks"},4000);
+});
+render();
+})();
+</script>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    try{navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
+  });
+}
+</script>
+</body>
+</html>
