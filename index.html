@@ -457,35 +457,8 @@ var NPCS=[
 ];
 
 /* ---------- Challenges: [track, rank, title, goal, how] ---------- */
-var TRACKS=["Master Hunter","Survivalist","Sharpshooter","Horseman","Weapons Expert"];
-var CH_RAW=[
-["Master Hunter",1,"Skin 3 deer",3,"Kill and skin 3 deer. They roam Lemoyne, New Hanover and Ambarino; the grassland between Rhodes and Bolger Glade is a good spot."],
-["Master Hunter",2,"Collect 3 perfect rabbit pelts",3,"Use the Varmint Rifle or a small game arrow to the head. Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."],
-["Master Hunter",3,"Track 10 different species with binoculars",10,"Study each animal through the binoculars, then hold the button to track it. You need 10 different species."],
-["Master Hunter",4,"Call an animal and kill it cleanly, 5 times",5,"Sneak up on an animal, call it over, then kill it with a Dead Eye headshot."],
-["Master Hunter",5,"Skin 3 black or grizzly bears",3,"Grizzly: Grizzlies East, northwest of Wallace Station. Bring plenty of ammo and aim for the head."],
-["Master Hunter",6,"Kill and skin 5 cougars with a bow only",5,"Cougars: south of Blackwater and southwest of Flat Iron Lake, and in New Austin after Chapter 6. One guide also places them in the northern mountains."],
-["Master Hunter",7,"Lure and kill one herbivore and one predator with bait",2,"Craft bait from meat in the crafting menu, scatter it, wait for the animal to come, then kill it. One herbivore and one predator."],
-["Master Hunter",8,"Catch 3 fish without a fishing rod",3,"Spot fish in the water and shoot them with a bow."],
-["Master Hunter",9,"Catch an opossum playing dead",1,"Chase it until it faints, then pick it up quickly. Opossums: between the R and I of Ambarino, north of Annesburg, and the north shore of Flat Iron Lake."],
-["Master Hunter",10,"Find and kill the legendary panther Giaguaro",1,"South of Rhodes near Bolger Glade. It only spawns after you complete 9 Master Hunter challenges."],
-["Survivalist",2,"Hand in 5 animals to camp or a Trapper",5,"Bring carcasses or pelts to your camp or to a Trapper."],
-["Survivalist",3,"Kill 5 animals with the Varmint Rifle",5,"Small game is easiest: rabbits, squirrels, raccoons and similar."],
-["Survivalist",6,"Kill a scavenging animal while it feeds on a corpse, 5 times",5,"Wait for a scavenger to start feeding on a body, then shoot it."],
-["Survivalist",7,"Kill 8 small game animals with consecutive small game arrows",8,"Every shot must be a small game arrow and must kill, or the streak breaks."],
-["Sharpshooter",1,"Kill 3 flying birds",3,"Any flying birds count."],
-["Sharpshooter",2,"Kill 2 different species in one Dead Eye",2,"Mark two different animals in a single Dead Eye use."],
-["Sharpshooter",3,"Kill 5 flying birds from a moving train",5,"Shoot birds while riding a train."],
-["Sharpshooter",5,"Kill 6 animals without switching or reloading",6,"Use a weapon with enough ammo, and do not switch or reload between kills."],
-["Sharpshooter",10,"Kill 3 flying birds with 3 consecutive long scoped rifle shots",3,"Use a long-range scoped rifle and do not miss."],
-["Horseman",1,"Kill 5 rabbits from horseback",5,"Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."],
-["Horseman",5,"Trample 5 animals on horseback",5,"Ride over animals until they are trampled."],
-["Horseman",7,"Kill 7 enemies from horseback without dismounting",7,"Human enemies, for example during a bounty or camp attack."],
-["Horseman",8,"Kill 9 predators from horseback",9,"Wolves, cougars, bears and similar."],
-["Weapons Expert",3,"Kill 3 birds of prey with a tomahawk only",3,"Hawks, eagles and owls. Throw the tomahawk."],
-["Weapons Expert",9,"Kill 9 unaware enemies from behind with a bow",9,"Human enemies who have not noticed you."],
-["Weapons Expert",10,"Kill a grizzly bear with throwing knives only, taking no damage",1,"Grizzly: Grizzlies East, northwest of Wallace Station."]
-];
+var TRACKS=["Master Hunter", "Survivalist", "Sharpshooter", "Horseman", "Weapons Expert", "Bandit", "Gambler", "Herbalist", "Explorer"];
+var CH_RAW=[["Master Hunter", 1, "Skin 3 deer", 3, "Kill and skin 3 deer. They roam Lemoyne, New Hanover and Ambarino; the grassland between Rhodes and Bolger Glade is a good spot."], ["Master Hunter", 2, "Collect 3 perfect rabbit pelts", 3, "Use the Varmint Rifle or a small game arrow to the head. Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."], ["Master Hunter", 3, "Track 10 different species with binoculars", 10, "Study each animal through the binoculars, then hold the button to track it. You need 10 different species."], ["Master Hunter", 4, "Call an animal and kill it cleanly, 5 times", 5, "Sneak up on an animal, call it over, then kill it with a Dead Eye headshot."], ["Master Hunter", 5, "Skin 3 black or grizzly bears", 3, "Grizzly: Grizzlies East, northwest of Wallace Station. Bring plenty of ammo and aim for the head."], ["Master Hunter", 6, "Kill and skin 5 cougars with a bow only", 5, "Cougars: south of Blackwater and southwest of Flat Iron Lake, and in New Austin after Chapter 6. One guide also places them in the northern mountains."], ["Master Hunter", 7, "Lure and kill one herbivore and one predator with bait", 2, "Craft bait from meat in the crafting menu, scatter it, wait for the animal to come, then kill it. One herbivore and one predator."], ["Master Hunter", 8, "Catch 3 fish without a fishing rod", 3, "Spot fish in the water and shoot them with a bow."], ["Master Hunter", 9, "Catch an opossum playing dead", 1, "Chase it until it faints, then pick it up quickly. Opossums: between the R and I of Ambarino, north of Annesburg, and the north shore of Flat Iron Lake."], ["Master Hunter", 10, "Find and kill the legendary panther Giaguaro", 1, "South of Rhodes near Bolger Glade. It only spawns after you complete 9 Master Hunter challenges."], ["Survivalist", 1, "Catch 3 Bluegill", 3, ""], ["Survivalist", 2, "Hand in 5 animals to camp or a Trapper", 5, ""], ["Survivalist", 3, "Kill 5 animals with the Varmint Rifle", 5, ""], ["Survivalist", 4, "Craft a dynamite, fire, improved, poison and small game arrow", 5, "Five arrow types in total: dynamite, fire, improved, poison and small game."], ["Survivalist", 5, "Catch a fish in the Bayou from a riverboat, and one while standing on train tracks", 2, "Two catches: one from a riverboat in the Bayou, one while standing on train tracks."], ["Survivalist", 6, "Kill a scavenging animal while it is feeding on a corpse, 5 times", 5, ""], ["Survivalist", 7, "Kill 8 small game animals with consecutive small game arrow shots", 1, "Eight kills in a row with small game arrows."], ["Survivalist", 8, "Craft a homing tomahawk, improved tomahawk, volatile dynamite and volatile fire bottle", 4, "Four items in total."], ["Survivalist", 9, "Catch a fish weighing at least 19 lbs", 1, ""], ["Survivalist", 10, "Catch one of each type of fish", 1, ""], ["Sharpshooter", 1, "Kill 3 flying birds", 3, ""], ["Sharpshooter", 2, "Kill 2 different animal species in one Dead Eye use", 1, ""], ["Sharpshooter", 3, "Kill 5 flying birds while on a moving train", 5, ""], ["Sharpshooter", 4, "Kill someone 80 feet away with a tomahawk", 1, ""], ["Sharpshooter", 5, "Kill 6 animals without switching or reloading your weapon", 1, ""], ["Sharpshooter", 6, "Kill someone at least 660 feet away with a long scoped rifle", 1, ""], ["Sharpshooter", 7, "Get 7 headshots in a row", 1, ""], ["Sharpshooter", 8, "Disarm 3 enemies without reloading or switching your weapon", 1, ""], ["Sharpshooter", 9, "Shoot 3 people's hats off in the same Dead Eye use", 1, ""], ["Sharpshooter", 10, "Kill 3 flying birds with 3 consecutive long scoped rifle shots", 1, ""], ["Horseman", 1, "Kill 5 rabbits from horseback", 5, "Rabbits: near Valentine, Strawberry, Rhodes and Saint Denis."], ["Horseman", 2, "Jump over 3 obstacles in 15 seconds", 1, ""], ["Horseman", 3, "Ride from Valentine to Rhodes in less than 5 minutes", 1, ""], ["Horseman", 4, "While mounted, drag a victim 3300 feet with your lasso", 1, ""], ["Horseman", 5, "Trample 5 animals while on horseback", 5, ""], ["Horseman", 6, "Ride from Strawberry to Saint Denis in less than 9 minutes without touching water", 1, ""], ["Horseman", 7, "Kill 7 enemies from horseback without dismounting", 1, ""], ["Horseman", 8, "Kill 9 predators from horseback", 9, ""], ["Horseman", 9, "Ride from Van Horn to Blackwater in less than 17 minutes without touching water", 1, ""], ["Horseman", 10, "Break every wild horse breed", 1, ""], ["Weapons Expert", 1, "Kill 3 enemies with a knife", 3, ""], ["Weapons Expert", 2, "Kill 3 enemies in 10 seconds using only throwing knives", 1, ""], ["Weapons Expert", 3, "Kill 3 birds of prey using only a tomahawk", 3, ""], ["Weapons Expert", 4, "Kill 10 enemies with a shotgun using crafted ammo", 10, ""], ["Weapons Expert", 5, "Kill 5 mounted enemies, using 1 throwing knife per kill", 5, ""], ["Weapons Expert", 6, "Kill 4 enemies with a single stick of dynamite", 1, ""], ["Weapons Expert", 7, "Kill 4 consecutive enemies by throwing and retrieving the same tomahawk", 1, ""], ["Weapons Expert", 8, "Kill 15 enemies using a long barrelled shotgun", 15, ""], ["Weapons Expert", 9, "Kill 9 unaware enemies from behind using the bow", 9, ""], ["Weapons Expert", 10, "Kill a grizzly bear using only throwing knives, taking no damage", 1, "Grizzly: Grizzlies East, northwest of Wallace Station."], ["Bandit", 1, "Hold up 5 townsfolk", 5, ""], ["Bandit", 2, "Rob 2 coaches or return 2 stolen coaches to a Fence", 2, ""], ["Bandit", 3, "Rob the cash register in any 4 shops in one day", 4, ""], ["Bandit", 4, "Rob 3 coaches or return 3 stolen coaches to a Fence in one day", 3, ""], ["Bandit", 5, "Amass a $250 bounty in one state", 1, ""], ["Bandit", 6, "Steal 5 horses and sell them to the Horse Fence at Clemens Cove", 5, ""], ["Bandit", 7, "Rob $50 worth of cash and valuables from townsfolk and travellers", 1, ""], ["Bandit", 8, "Steal 7 wagons and sell them to the Fence at Emerald Ranch", 7, ""], ["Bandit", 9, "Hogtie someone and leave them on the railroad 3 times", 3, ""], ["Bandit", 10, "Complete 5 train robberies without dying or being caught", 5, ""], ["Gambler", 1, "Win 5 hands of Poker", 5, ""], ["Gambler", 2, "In Blackjack, double down and win the hand 5 times", 5, ""], ["Gambler", 3, "Win 3 games of Five Finger Fillet", 3, ""], ["Gambler", 4, "Bust a Poker table at Flatneck Station, Saint Denis and Valentine", 3, "One table in each of the three places."], ["Gambler", 5, "Win 3 rounds of Dominoes without drawing any tiles against 2 or fewer opponents", 3, ""], ["Gambler", 6, "Beat the Blackjack dealer in Rhodes and Van Horn", 2, ""], ["Gambler", 7, "Beat the Five Finger Fillet player in Strawberry, Valentine and Van Horn", 3, ""], ["Gambler", 8, "Win 3 hands of Blackjack with 3 hits or more", 3, ""], ["Gambler", 9, "Win 3 games of Dominoes in a row", 1, ""], ["Gambler", 10, "Win 3 hands of Poker in a row", 1, ""], ["Herbalist", 1, "Pick 6 Yarrow", 6, ""], ["Herbalist", 2, "Pick and eat 4 species of berry", 4, ""], ["Herbalist", 3, "Craft 7 items using Sage as an ingredient", 7, ""], ["Herbalist", 4, "Pick 5 mushrooms and feed them to your horse", 5, ""], ["Herbalist", 5, "Craft 9 items using Indian Tobacco as an ingredient", 9, ""], ["Herbalist", 6, "Pick 15 different species of herb", 15, ""], ["Herbalist", 7, "Craft and use 5 special miracle tonics", 5, ""], ["Herbalist", 8, "Use Oleander to craft 6 poison weapons", 6, ""], ["Herbalist", 9, "Pick one of each species of herb", 1, ""], ["Herbalist", 10, "Season and cook all 11 types of meat", 11, ""], ["Explorer", 1, "Find a treasure map", 1, "Reward: Explorer Holster"], ["Explorer", 2, "Find a treasure", 1, "Reward: $5 and Stamina Exp"], ["Explorer", 3, "Find a treasure", 1, "Reward: Explorer Bandolier"], ["Explorer", 4, "Find a treasure", 1, "Reward: $10 and Stamina Exp"], ["Explorer", 5, "Find a treasure", 1, "Reward: $10 and Stamina Exp"], ["Explorer", 6, "Find a treasure", 1, "Reward: $15 and Stamina Exp"], ["Explorer", 7, "Find a treasure", 1, "Reward: Explorer Gun Belt"], ["Explorer", 8, "Find a treasure", 1, "Reward: $15 and Stamina Exp"], ["Explorer", 9, "Find a treasure", 1, "Reward: $20 and Stamina Exp"], ["Explorer", 10, "Find a treasure", 1, "Reward: Explorer Off-Hand Holster"]];
 var chals=CH_RAW.map(function(c){return{id:slug(c[0]+" "+c[1]),track:c[0],rank:c[1],title:c[2],goal:c[3],hint:c[4]}});
 var chById={};chals.forEach(function(c){chById[c.id]=c});
 
@@ -596,21 +569,32 @@ function viewM(){
 
 /* ---------- Render: challenges ---------- */
 function chalSub(c){
-  var p=store.prog[c.id]||0;
+  var p=Math.min(store.prog[c.id]||0,c.goal);
   return esc(c.track)+" "+c.rank+(c.goal>1?' · <span class="cs">'+p+" of "+c.goal+"</span>":"");
 }
 function chalRow(c){
-  var d=!!store.cdone[c.id],key="c:"+c.id,open=!!ui.open[key],p=store.prog[c.id]||0;
+  var d=!!store.cdone[c.id],key="c:"+c.id,p=Math.min(store.prog[c.id]||0,c.goal);
+  var hasMore=!!c.hint||c.goal>1,open=hasMore&&!!ui.open[key];
+  var label=c.track==="Explorer"?"Reward":"How";
+  var hint=c.hint;if(c.track==="Explorer")hint=hint.replace(/^Reward: /,"");
   return'<li class="row'+(d?" done":"")+(open?" open":"")+'" data-key="'+key+'" data-cid="'+c.id+'">'+
     cb(d,"cdone",'data-cid="'+c.id+'"',"Done "+c.title)+
-    '<button class="main" type="button" data-act="open" data-key="'+key+'" aria-expanded="'+open+'"><span class="txt"><span class="nm">'+esc(c.title)+'</span><span class="sub">'+chalSub(c)+'</span></span>'+CHEV+'</button>'+
-    '<div class="more"'+(open?"":" hidden")+'><div><p class="k">How</p><p>'+esc(c.hint)+'</p></div>'+
-    (c.goal>1?'<div class="ctr"><span class="k" style="margin:0">Progress</span><div class="step"><button type="button" data-act="dec" data-cid="'+c.id+'" aria-label="Minus one">−</button><span class="cnt">'+p+' / '+c.goal+'</span><button type="button" data-act="inc" data-cid="'+c.id+'" aria-label="Plus one">+</button></div></div>':'')+
-    '</div></li>';
+    (hasMore
+      ?'<button class="main" type="button" data-act="open" data-key="'+key+'" aria-expanded="'+open+'"><span class="txt"><span class="nm">'+esc(c.title)+'</span><span class="sub">'+chalSub(c)+'</span></span>'+CHEV+'</button>'
+      :'<div class="main"><span class="txt"><span class="nm">'+esc(c.title)+'</span><span class="sub">'+chalSub(c)+'</span></span></div>')+
+    (hasMore
+      ?'<div class="more"'+(open?"":" hidden")+'>'+
+        (c.hint?'<div><p class="k">'+label+'</p><p>'+esc(hint)+'</p></div>':'')+
+        (c.goal>1?'<div class="ctr"><span class="k" style="margin:0">Progress</span><div class="step"><button type="button" data-act="dec" data-cid="'+c.id+'" aria-label="Minus one">−</button><span class="cnt">'+p+' / '+c.goal+'</span><button type="button" data-act="inc" data-cid="'+c.id+'" aria-label="Plus one">+</button></div></div>':'')+
+        '</div>'
+      :'')+
+    '</li>';
 }
 function viewC(){
-  var by={},any=false;
+  var by={},any=false,tot={},dn={};
   chals.forEach(function(c){
+    tot[c.track]=(tot[c.track]||0)+1;
+    if(store.cdone[c.id])dn[c.track]=(dn[c.track]||0)+1;
     var d=!!store.cdone[c.id];
     if(ui.sc==="open"&&d)return;
     if(ui.sc==="done"&&!d)return;
@@ -621,7 +605,7 @@ function viewC(){
   var out="";
   TRACKS.forEach(function(t){
     var list=by[t];if(!list)return;
-    out+='<div class="sec"><span>'+esc(t)+'</span><span>'+list.length+'</span></div><ul>'+list.map(chalRow).join("")+'</ul>';
+    out+='<div class="sec"><span>'+esc(t)+'</span><span>'+(dn[t]||0)+' of '+tot[t]+' done</span></div><ul>'+list.map(chalRow).join("")+'</ul>';
   });
   return out;
 }
@@ -691,7 +675,7 @@ $("list").addEventListener("click",function(e){
     ui.open[key]=!ui.open[key];
     var row=t.closest(".row"),more=row.querySelector(".more");
     row.classList.toggle("open",!!ui.open[key]);
-    more.hidden=!ui.open[key];
+    if(more)more.hidden=!ui.open[key];
     t.setAttribute("aria-expanded",!!ui.open[key]);
     return;
   }
