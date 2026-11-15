@@ -1,5 +1,6 @@
 /* Trapper's Ledger service worker.
-   Bump CACHE_VERSION whenever you upload a changed index.html so phones pick up the new version. */
+   Online: always loads the newest files and refreshes the offline copy.
+   Offline: falls back to the saved copy. No need to bump a version when index.html changes. */
 var CACHE_VERSION = "ledger-v1";
 
 self.addEventListener("install", function (e) {
@@ -40,11 +41,19 @@ self.addEventListener("fetch", function (e) {
     return;
   }
 
-  /* Own files: cache first, fall back to network, fall back to the page. */
+  /* Own files: network first, saved copy when offline. */
   if (url.origin === self.location.origin) {
     e.respondWith(
-      caches.match(req, { ignoreSearch: true }).then(function (hit) {
-        return hit || fetch(req).catch(function () { return caches.match("index.html"); });
+      fetch(req).then(function (res) {
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE_VERSION).then(function (c) { c.put(req, copy); });
+        }
+        return res;
+      }).catch(function () {
+        return caches.match(req, { ignoreSearch: true }).then(function (hit) {
+          return hit || caches.match("index.html");
+        });
       })
     );
   }
